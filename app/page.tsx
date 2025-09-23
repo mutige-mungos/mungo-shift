@@ -1,21 +1,38 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
+import {
+  ArrowUpRight,
+  Barcode,
+  Clock,
+  Gamepad,
+  HelpCircle,
+  Key as KeyIcon,
+  RssFeed,
+  Text as TextIcon,
+} from "iconoir-react";
+
 import { CopyButton } from "@/components/copy-button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { loadActiveBl4Codes } from "@/lib/bl4";
 
 function formatUpdated(timestamp: string): string {
   const parsed = new Date(timestamp);
   if (Number.isNaN(parsed.getTime())) {
-    return "Unknown";
+    return "Unbekannt";
   }
 
-  return new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "UTC",
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   }).format(parsed);
 }
 
-function formatExpiry(timestamp?: string): string | null {
+function formatArchived(timestamp?: string): string | null {
   if (!timestamp) {
     return null;
   }
@@ -25,10 +42,59 @@ function formatExpiry(timestamp?: string): string | null {
     return null;
   }
 
-  return new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeZone: "UTC",
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
   }).format(parsed);
+}
+
+function formatGenerated(timestamp?: string): string | null {
+  if (!timestamp) {
+    return null;
+  }
+
+  const parsed = new Date(timestamp);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(parsed);
+}
+
+function UnknownIndicator({ label = "TBD" }: { label?: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+      <HelpCircle className="h-4 w-4 text-orange-500" aria-hidden />
+      <span className="font-medium text-foreground">{label}</span>
+    </span>
+  );
+}
+
+function InfoChip({
+  icon,
+  children,
+  title,
+}: {
+  icon: ReactNode;
+  children: ReactNode;
+  title: string;
+}) {
+  return (
+    <span
+      className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-orange-300/50 hover:bg-muted/70"
+      title={title}
+    >
+      <span className="text-orange-500">{icon}</span>
+      <span className="font-medium text-foreground">{children}</span>
+    </span>
+  );
 }
 
 function CodesList({
@@ -45,54 +111,71 @@ function CodesList({
   }
 
   return (
-    <ul className="space-y-4">
+    <ul className="space-y-6">
       {codes.map((item) => {
-        const formattedExpiry = formatExpiry(item.expires);
+        const archivedIso = formatArchived(item.archived);
+        const reward = item.reward ? (
+          <InfoChip
+            icon={<KeyIcon className="h-4 w-4" aria-hidden />}
+            title="Belohnung"
+          >
+            {item.reward}
+          </InfoChip>
+        ) : (
+          <UnknownIndicator label="TBD" />
+        );
+
+        const archived = archivedIso ? (
+          <InfoChip
+            icon={<Clock className="h-4 w-4" aria-hidden />}
+            title="Archiviert"
+          >
+            {archivedIso}
+          </InfoChip>
+        ) : (
+          <UnknownIndicator label="Keine Angaben" />
+        );
 
         return (
-          <li
-            key={item.code}
-            className="rounded-xl border border-border bg-card p-6 shadow-sm"
-          >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="space-y-2">
-                <p className="font-mono text-lg font-semibold tracking-[0.3em] text-foreground sm:text-xl">
-                  {item.code}
-                </p>
-                {item.reward ? (
-                  <p className="text-sm text-muted-foreground">{item.reward}</p>
-                ) : null}
+          <li key={item.code}>
+            <Card className="overflow-hidden border-border/60 bg-card/80 transition-all hover:-translate-y-0.5 hover:border-orange-300/70 hover:shadow-lg">
+              <CardHeader className="space-y-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="flex items-center gap-2 font-mono text-lg font-semibold tracking-[0.35em] text-foreground sm:text-xl">
+                    {item.code}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="success" className="gap-1 normal-case">
+                      Active
+                    </Badge>
+                    <CopyButton value={item.code} />
+                  </div>
+                </div>
                 {item.source ? (
-                  <p className="text-xs text-muted-foreground">
-                    Source: {" "}
-                    {item.source.startsWith("http") ? (
-                      <Link
-                        href={item.source}
-                        className="underline underline-offset-2"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {item.source}
-                      </Link>
-                    ) : (
-                      item.source
-                    )}
-                  </p>
+                  <Link
+                    href={item.source}
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-orange-500"
+                    target={item.source.startsWith("http") ? "_blank" : undefined}
+                    rel={item.source.startsWith("http") ? "noopener noreferrer" : undefined}
+                  >
+                    <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+                    <span className="font-medium">Quelle ansehen</span>
+                  </Link>
                 ) : null}
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                {formattedExpiry ? (
-                  <span className="rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
-                    Expires {formattedExpiry}
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                    No expiry listed
-                  </span>
-                )}
-                <CopyButton value={item.code} />
-              </div>
-            </div>
+              </CardHeader>
+              <CardContent className="flex flex-wrap gap-3 text-sm">
+                {reward}
+                {item.expiresRaw ? (
+                  <InfoChip
+                    icon={<Clock className="h-4 w-4" aria-hidden />}
+                    title="Ablauf"
+                  >
+                    {item.expiresRaw}
+                  </InfoChip>
+                ) : null}
+                {archived}
+              </CardContent>
+            </Card>
           </li>
         );
       })}
@@ -104,40 +187,84 @@ export default async function Home() {
   try {
     const data = await loadActiveBl4Codes();
     const updatedText = formatUpdated(data.updatedAt);
+    const generatedText = formatGenerated(data.generatedAt);
 
     return (
       <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-10 px-4 py-12 sm:px-8">
-        <header className="space-y-3">
-          <p className="text-sm font-medium text-primary">Borderlands 4</p>
-          <h1 className="text-3xl font-bold sm:text-4xl">Active SHiFT codes</h1>
-          <p className="text-sm text-muted-foreground">
-            Last refreshed {updatedText} UTC · {data.count} active code
-            {data.count === 1 ? "" : "s"}
-          </p>
-          <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-            <Link
-              href="/bl4.txt"
-              className="underline underline-offset-4 hover:text-foreground"
+        <header className="space-y-5">
+          <Badge variant="outline" className="gap-2 border-orange-400/30 text-orange-500">
+            Borderlands 4
+          </Badge>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="flex items-center gap-3 text-3xl font-bold text-foreground sm:text-4xl">
+              <Gamepad className="h-7 w-7 text-orange-500" aria-hidden />
+              <span>
+                <span className="text-orange-500">SHiFT</span> Codes
+              </span>
+            </h1>
+            <Badge variant="accent" className="gap-2 normal-case">
+              Mungo Edition
+            </Badge>
+          </div>
+          <div className="flex flex-wrap items-center gap-4 rounded-xl border border-orange-400/20 bg-orange-400/10 p-4 text-sm text-muted-foreground">
+            <span className="inline-flex items-center gap-2">
+              <Clock className="h-4 w-4 text-orange-500" aria-hidden />
+              <span>Aktualisiert {updatedText}</span>
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <Barcode className="h-4 w-4 text-orange-500" aria-hidden />
+              <span>
+                {data.count} aktive {data.count === 1 ? "Code" : "Codes"}
+              </span>
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-full border-border/70 bg-background/80 px-4 py-2 text-sm text-foreground transition hover:border-orange-300 hover:text-orange-500"
             >
-              Plain text export
-            </Link>
-            <Link
-              href="/bl4.rss"
-              className="underline underline-offset-4 hover:text-foreground"
+              <Link href="/bl4.txt" className="flex items-center gap-2">
+                <TextIcon className="h-4 w-4" aria-hidden />
+                Plain text export
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-full border-border/70 bg-background/80 px-4 py-2 text-sm text-foreground transition hover:border-orange-300 hover:text-orange-500"
             >
-              RSS feed
-            </Link>
-            <a
-              href="https://github.com/DankestMemeLord/autoshift-codes"
-              className="underline underline-offset-4 hover:text-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
+              <Link href="/bl4.rss" className="flex items-center gap-2">
+                <RssFeed className="h-4 w-4" aria-hidden />
+                RSS feed
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-full border-border/70 bg-background/80 px-4 py-2 text-sm text-foreground transition hover:border-orange-300 hover:text-orange-500"
             >
-              Upstream feed
-            </a>
+              <a
+                href="https://github.com/DankestMemeLord/autoshift-codes"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                <ArrowUpRight className="h-4 w-4" aria-hidden />
+                Upstream feed
+              </a>
+            </Button>
           </div>
         </header>
         <CodesList codes={data.items} />
+        <footer className="mt-auto border-t border-muted pt-4 text-xs text-muted-foreground">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              Quelle aktuallisier {generatedText ?? "Unbekannt"}
+            </span>
+            <span className="sm:text-right">(C) 2025 Mutige Mungos</span>
+          </div>
+        </footer>
       </main>
     );
   } catch (error) {

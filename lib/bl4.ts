@@ -9,21 +9,25 @@ import {
 
 export interface Bl4Data {
   updatedAt: string;
+  generatedAt?: string;
   count: number;
   items: SanitizedCode[];
 }
 
 function sortCodes(items: SanitizedCode[]): SanitizedCode[] {
   return [...items].sort((a, b) => {
-    if (a.expires && b.expires) {
-      return new Date(a.expires).getTime() - new Date(b.expires).getTime();
+    const aArchived = a.archived ? new Date(a.archived).getTime() : null;
+    const bArchived = b.archived ? new Date(b.archived).getTime() : null;
+
+    if (aArchived !== null && bArchived !== null) {
+      return bArchived - aArchived;
     }
 
-    if (a.expires) {
+    if (aArchived !== null) {
       return -1;
     }
 
-    if (b.expires) {
+    if (bArchived !== null) {
       return 1;
     }
 
@@ -36,7 +40,7 @@ export async function loadActiveBl4Codes(options: {
   now?: Date;
 } = {}): Promise<Bl4Data> {
   const { force = false, now = new Date() } = options;
-  const { list, fetchedAt } = await fetchUpstream({ force });
+  const { list, fetchedAt, generatedAt } = await fetchUpstream({ force });
 
   const map = new Map<string, SanitizedCode>();
 
@@ -64,8 +68,17 @@ export async function loadActiveBl4Codes(options: {
 
   const items = sortCodes(Array.from(map.values()));
 
+  let generatedIso: string | undefined;
+  if (generatedAt) {
+    const parsed = new Date(generatedAt);
+    if (!Number.isNaN(parsed.getTime())) {
+      generatedIso = parsed.toISOString();
+    }
+  }
+
   return {
     updatedAt: new Date(fetchedAt).toISOString(),
+    generatedAt: generatedIso,
     count: items.length,
     items,
   };

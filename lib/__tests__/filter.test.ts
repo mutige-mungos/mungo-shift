@@ -74,12 +74,25 @@ describe("sanitize", () => {
     const sanitized = sanitize(entry);
     const expected: SanitizedCode = {
       code: "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE",
+      archived: undefined,
       expires: "2025-01-01T00:00:00.000Z",
+      expiresRaw: "2025-01-01T00:00:00Z",
       reward: "5 Golden Keys",
       source: "https://example.com",
     };
 
     expect(sanitized).toEqual(expected);
+  });
+
+  it("parses archived timestamps", () => {
+    const entry: UpstreamEntry = {
+      game: "Borderlands 4",
+      code: "aaaaa-bbbbb-ccccc-ddddd-eeeee",
+      archived: "2025-09-20 07:26:24.013778+00:00",
+    };
+
+    const sanitized = sanitize(entry);
+    expect(sanitized?.archived).toBe("2025-09-20T07:26:24.013Z");
   });
 
   it("returns null when no valid code", () => {

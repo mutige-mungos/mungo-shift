@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Check, Copy as CopyIcon } from "iconoir-react";
+
 import { Button } from "@/components/ui/button";
 
 export interface CopyButtonProps {
@@ -34,9 +36,17 @@ export function CopyButton({ value }: CopyButtonProps) {
       type="button"
       onClick={handleCopy}
       aria-label={copied ? "Code copied" : `Copy ${value}`}
-      variant={copied ? "secondary" : "default"}
+      variant={copied ? "secondary" : "outline"}
+      size="icon"
+      className="rounded-full transition-colors hover:border-orange-400/60 hover:text-orange-500"
+      title={copied ? "Code kopiert" : "Code kopieren"}
     >
-      {copied ? "Copied" : "Copy"}
+      {copied ? (
+        <Check className="h-4 w-4" aria-hidden />
+      ) : (
+        <CopyIcon className="h-4 w-4" aria-hidden />
+      )}
+      <span className="sr-only">{copied ? "Code copied" : "Copy code"}</span>
     </Button>
   );
 }

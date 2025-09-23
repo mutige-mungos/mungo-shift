@@ -10,6 +10,7 @@ export interface FetchOptions {
 export interface FetchResult {
   list: UpstreamEntry[];
   fetchedAt: number;
+  generatedAt?: string;
 }
 
 const DEFAULT_UPSTREAM_URL =
@@ -38,23 +39,81 @@ const TTL = resolveTtl();
 let cachedResult: FetchResult | null = null;
 let inflight: Promise<FetchResult> | null = null;
 
-function normaliseList(data: unknown): UpstreamEntry[] {
-  if (Array.isArray(data)) {
-    return data.filter((item): item is UpstreamEntry =>
-      item !== null && typeof item === "object",
-    );
+interface NormalisedPayload {
+  list: UpstreamEntry[];
+  metaGenerated?: string;
+}
+
+function extractMetaGenerated(container: unknown): string | undefined {
+  if (!container || typeof container !== "object") {
+    return undefined;
   }
 
-  if (data && typeof data === "object" && "codes" in data) {
-    const maybeList = (data as { codes?: unknown }).codes;
-    if (Array.isArray(maybeList)) {
-      return maybeList.filter((item): item is UpstreamEntry =>
-        item !== null && typeof item === "object",
-      );
+  const meta = (container as { meta?: unknown }).meta;
+  if (!meta || typeof meta !== "object") {
+    return undefined;
+  }
+
+  const generated = (meta as { generated?: unknown }).generated;
+  if (typeof generated === "string") {
+    return generated;
+  }
+
+  if (generated && typeof generated === "object" && "human" in generated) {
+    const human = (generated as { human?: unknown }).human;
+    if (typeof human === "string") {
+      return human;
     }
   }
 
-  return [];
+  return undefined;
+}
+
+function normalisePayload(data: unknown): NormalisedPayload {
+  const payload: NormalisedPayload = {
+    list: [],
+    metaGenerated: undefined,
+  };
+
+  function pushEntry(entry: unknown) {
+    if (entry !== null && typeof entry === "object") {
+      payload.list.push(entry as UpstreamEntry);
+    }
+  }
+
+  function handleContainer(container: unknown) {
+    if (!container || typeof container !== "object") {
+      return;
+    }
+
+    if (!payload.metaGenerated) {
+      payload.metaGenerated = extractMetaGenerated(container);
+    }
+
+    const maybeCodes = (container as { codes?: unknown }).codes;
+    if (Array.isArray(maybeCodes)) {
+      for (const item of maybeCodes) {
+        pushEntry(item);
+      }
+      return;
+    }
+
+    pushEntry(container);
+  }
+
+  if (Array.isArray(data)) {
+    for (const item of data) {
+      handleContainer(item);
+    }
+    return payload;
+  }
+
+  if (data && typeof data === "object" && "codes" in data) {
+    handleContainer(data);
+    return payload;
+  }
+
+  return payload;
 }
 
 export async function fetchUpstream(
@@ -93,11 +152,12 @@ export async function fetchUpstream(
       }
 
       const data = await response.json();
-      const list = normaliseList(data);
+      const { list, metaGenerated } = normalisePayload(data);
 
       const result: FetchResult = {
         list,
         fetchedAt: Date.now(),
+        generatedAt: metaGenerated,
       };
 
       cachedResult = result;
