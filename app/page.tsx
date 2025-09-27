@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   ArrowUpRight,
   Barcode,
+  Calendar,
   Clock,
   Gamepad,
   HelpCircle,
@@ -17,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { loadActiveBl4Codes } from "@/lib/bl4";
+import { cn } from "@/lib/utils";
 
 function formatUpdated(timestamp: string): string {
   const parsed = new Date(timestamp);
@@ -33,7 +35,7 @@ function formatUpdated(timestamp: string): string {
   }).format(parsed);
 }
 
-function formatArchived(timestamp?: string): string | null {
+function formatDateOnly(timestamp?: string): string | null {
   if (!timestamp) {
     return null;
   }
@@ -48,6 +50,19 @@ function formatArchived(timestamp?: string): string | null {
     month: "2-digit",
     year: "numeric",
   }).format(parsed);
+}
+
+function isExpiredDate(timestamp?: string): boolean {
+  if (!timestamp) {
+    return false;
+  }
+
+  const parsed = new Date(timestamp);
+  if (Number.isNaN(parsed.getTime())) {
+    return false;
+  }
+
+  return parsed.getTime() < Date.now();
 }
 
 function formatGenerated(timestamp?: string): string | null {
@@ -69,7 +84,7 @@ function formatGenerated(timestamp?: string): string | null {
   }).format(parsed);
 }
 
-function UnknownIndicator({ label = "TBD" }: { label?: string }) {
+function UnknownIndicator({ label = "unbekannt" }: { label?: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-2.5 py-1.5 text-xs text-muted-foreground sm:gap-2 sm:px-3 sm:py-2 sm:text-sm">
       <HelpCircle className="h-3.5 w-3.5 text-orange-500 sm:h-4 sm:w-4" aria-hidden />
@@ -114,7 +129,12 @@ function CodesList({
   return (
     <ul className="space-y-4 sm:space-y-6">
       {codes.map((item) => {
-        const archivedIso = formatArchived(item.archived);
+        const addedFormatted = formatDateOnly(item.added);
+        const expiresFormatted = formatDateOnly(item.expires);
+        const addedDisplay = addedFormatted ?? "unbekannt";
+        const expiresDisplay = expiresFormatted ?? "unbekannt";
+        const expired = isExpiredDate(item.expires);
+
         const reward = item.reward ? (
           <InfoChip
             icon={<KeyIcon className="h-4 w-4" aria-hidden />}
@@ -123,35 +143,59 @@ function CodesList({
             {item.reward}
           </InfoChip>
         ) : (
-          <UnknownIndicator label="TBD" />
+          <UnknownIndicator />
         );
 
-        const archived = archivedIso ? (
+        const addedChip = (
+          <InfoChip
+            icon={<Calendar className="h-4 w-4" aria-hidden />}
+            title="Hinzugefügt am"
+          >
+            {`Hinzugefügt am: ${addedDisplay}`}
+          </InfoChip>
+        );
+
+        const expiresChip = (
           <InfoChip
             icon={<Clock className="h-4 w-4" aria-hidden />}
-            title="Archiviert"
+            title="Ablaufdatum"
           >
-            {archivedIso}
+            {`Ablaufdatum: ${expiresDisplay}`}
           </InfoChip>
-        ) : (
-          <UnknownIndicator label="Keine Angaben" />
         );
 
         return (
           <li key={item.code}>
-            <Card className="overflow-hidden border-border/60 bg-card/80 transition-all hover:-translate-y-0.5 hover:border-orange-300/70 hover:shadow-lg">
-              <CardHeader className="space-y-3 sm:space-y-4">
+            <Card
+              className={cn(
+                "overflow-hidden border-border/60 bg-card/80 transition-all hover:-translate-y-0.5 hover:border-orange-300/70 hover:shadow-lg",
+                expired &&
+                  "border-border/40 bg-muted/70 opacity-70 hover:-translate-y-0 hover:border-border/40 hover:shadow-none",
+              )}
+            >
+              <CardHeader
+                className={cn("space-y-3 sm:space-y-4", expired && "line-through")}
+              >
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <span className="flex items-center gap-2 font-mono text-base font-semibold tracking-[0.18em] text-foreground sm:text-xl sm:tracking-[0.35em]">
                     {item.code}
                   </span>
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Badge
-                      variant="success"
-                      className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
-                    >
-                      Active
-                    </Badge>
+                    {expired ? (
+                      <Badge
+                        variant="subtle"
+                        className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
+                      >
+                        Abgelaufen
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="success"
+                        className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
+                      >
+                        Active
+                      </Badge>
+                    )}
                     <CopyButton value={item.code} />
                   </div>
                 </div>
@@ -167,17 +211,15 @@ function CodesList({
                   </Link>
                 ) : null}
               </CardHeader>
-              <CardContent className="flex flex-wrap gap-2 text-xs sm:gap-3 sm:text-sm">
+              <CardContent
+                className={cn(
+                  "flex flex-wrap gap-2 text-xs sm:gap-3 sm:text-sm",
+                  expired && "line-through",
+                )}
+              >
                 {reward}
-                {item.expiresRaw ? (
-                  <InfoChip
-                    icon={<Clock className="h-4 w-4" aria-hidden />}
-                    title="Ablauf"
-                  >
-                    {item.expiresRaw}
-                  </InfoChip>
-                ) : null}
-                {archived}
+                {addedChip}
+                {expiresChip}
               </CardContent>
             </Card>
           </li>

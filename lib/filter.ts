@@ -5,9 +5,10 @@ export const CODE_REGEX = /^[A-Z0-9]{5}(?:-[A-Z0-9]{5}){4}$/;
 
 export interface SanitizedCode {
   code: string;
-  archived?: string;
+  added?: string;
   expires?: string;
   expiresRaw?: string;
+  addedRaw?: string;
   reward?: string;
   source?: string;
 }
@@ -56,8 +57,8 @@ export function getExpiryIso(entry: UpstreamEntry): string | null {
   return parsed.toISOString();
 }
 
-export function getArchivedIso(entry: UpstreamEntry): string | null {
-  const raw = pickString(entry.archived);
+export function getAddedIso(entry: UpstreamEntry): string | null {
+  const raw = pickString((entry as { added?: unknown }).added) ?? pickString(entry.archived);
   if (!raw) {
     return null;
   }
@@ -92,15 +93,17 @@ export function sanitize(entry: UpstreamEntry, code?: string): SanitizedCode | n
 
   const rawExpires = pickString(entry.expires) ?? pickString(entry.expiry) ?? undefined;
   const expires = getExpiryIso(entry) ?? undefined;
-  const archived = getArchivedIso(entry) ?? undefined;
+  const rawAdded = pickString((entry as { added?: unknown }).added) ?? pickString(entry.archived) ?? undefined;
+  const added = getAddedIso(entry) ?? undefined;
   const reward = pickString(entry.reward) ?? pickString(entry.prize) ?? undefined;
   const source = pickString(entry.source) ?? undefined;
 
   const sanitized: SanitizedCode = {
     code: extracted,
-    archived,
+    added,
     expires,
     expiresRaw: rawExpires,
+    addedRaw: rawAdded,
     reward,
     source,
   };

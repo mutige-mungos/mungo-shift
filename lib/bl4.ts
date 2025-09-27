@@ -16,18 +16,18 @@ export interface Bl4Data {
 
 function sortCodes(items: SanitizedCode[]): SanitizedCode[] {
   return [...items].sort((a, b) => {
-    const aArchived = a.archived ? new Date(a.archived).getTime() : null;
-    const bArchived = b.archived ? new Date(b.archived).getTime() : null;
+    const aAdded = a.added ? new Date(a.added).getTime() : null;
+    const bAdded = b.added ? new Date(b.added).getTime() : null;
 
-    if (aArchived !== null && bArchived !== null) {
-      return bArchived - aArchived;
+    if (aAdded !== null && bAdded !== null) {
+      return bAdded - aAdded;
     }
 
-    if (aArchived !== null) {
+    if (aAdded !== null) {
       return -1;
     }
 
-    if (bArchived !== null) {
+    if (bAdded !== null) {
       return 1;
     }
 
