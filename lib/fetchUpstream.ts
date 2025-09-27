@@ -15,7 +15,7 @@ export interface FetchResult {
 
 const DEFAULT_UPSTREAM_URL =
   process.env.UPSTREAM_URL ??
-  "https://raw.githubusercontent.com/DankestMemeLord/autoshift-codes/refs/heads/main/shiftcodes.json";
+  "https://raw.githubusercontent.com/ugoogalizer/autoshift-codes/main/shiftcodes.json";
 
 const MIN_TTL = 1000 * 60 * 5; // 5 minutes
 const MAX_TTL = 1000 * 60 * 15; // 15 minutes

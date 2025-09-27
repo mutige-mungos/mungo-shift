@@ -255,7 +255,7 @@ export default async function Home() {
               className="rounded-full border-border/70 bg-background/80 px-3 py-1.5 text-xs text-foreground transition hover:border-orange-300 hover:text-orange-500 sm:px-4 sm:py-2 sm:text-sm"
             >
               <a
-                href="https://github.com/DankestMemeLord/autoshift-codes"
+                href="https://github.com/ugoogalizer/autoshift-codes"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2"
