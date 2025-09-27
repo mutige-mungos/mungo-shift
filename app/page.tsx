@@ -12,6 +12,7 @@ import {
 } from "iconoir-react";
 
 import { CopyButton } from "@/components/copy-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -267,11 +268,12 @@ export default async function Home() {
         </header>
         <CodesList codes={data.items} />
         <footer className="mt-auto border-t border-muted pt-4 text-xs text-muted-foreground">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <span>
-              Quelle aktuallisier {generatedText ?? "Unbekannt"}
-            </span>
-            <span className="sm:text-right">(C) 2025 Mutige Mungos</span>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <span>Quelle aktuallisier {generatedText ?? "Unbekannt"}</span>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <ThemeToggle />
+              <span className="sm:text-right">(C) 2025 Mutige Mungos</span>
+            </div>
           </div>
         </footer>
       </main>
