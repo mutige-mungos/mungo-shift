@@ -70,8 +70,8 @@ function formatGenerated(timestamp?: string): string | null {
 
 function UnknownIndicator({ label = "TBD" }: { label?: string }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
-      <HelpCircle className="h-4 w-4 text-orange-500" aria-hidden />
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-2.5 py-1.5 text-xs text-muted-foreground sm:gap-2 sm:px-3 sm:py-2 sm:text-sm">
+      <HelpCircle className="h-3.5 w-3.5 text-orange-500 sm:h-4 sm:w-4" aria-hidden />
       <span className="font-medium text-foreground">{label}</span>
     </span>
   );
@@ -88,7 +88,7 @@ function InfoChip({
 }) {
   return (
     <span
-      className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-orange-300/50 hover:bg-muted/70"
+      className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-orange-300/50 hover:bg-muted/70 sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
       title={title}
     >
       <span className="text-orange-500">{icon}</span>
@@ -111,7 +111,7 @@ function CodesList({
   }
 
   return (
-    <ul className="space-y-6">
+    <ul className="space-y-4 sm:space-y-6">
       {codes.map((item) => {
         const archivedIso = formatArchived(item.archived);
         const reward = item.reward ? (
@@ -139,13 +139,16 @@ function CodesList({
         return (
           <li key={item.code}>
             <Card className="overflow-hidden border-border/60 bg-card/80 transition-all hover:-translate-y-0.5 hover:border-orange-300/70 hover:shadow-lg">
-              <CardHeader className="space-y-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="flex items-center gap-2 font-mono text-lg font-semibold tracking-[0.35em] text-foreground sm:text-xl">
+              <CardHeader className="space-y-3 sm:space-y-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="flex items-center gap-2 font-mono text-base font-semibold tracking-[0.18em] text-foreground sm:text-xl sm:tracking-[0.35em]">
                     {item.code}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="success" className="gap-1 normal-case">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Badge
+                      variant="success"
+                      className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
+                    >
                       Active
                     </Badge>
                     <CopyButton value={item.code} />
@@ -154,16 +157,16 @@ function CodesList({
                 {item.source ? (
                   <Link
                     href={item.source}
-                    className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-orange-500"
+                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-orange-500 sm:text-sm"
                     target={item.source.startsWith("http") ? "_blank" : undefined}
                     rel={item.source.startsWith("http") ? "noopener noreferrer" : undefined}
                   >
-                    <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+                    <ArrowUpRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden />
                     <span className="font-medium">Quelle ansehen</span>
                   </Link>
                 ) : null}
               </CardHeader>
-              <CardContent className="flex flex-wrap gap-3 text-sm">
+              <CardContent className="flex flex-wrap gap-2 text-xs sm:gap-3 sm:text-sm">
                 {reward}
                 {item.expiresRaw ? (
                   <InfoChip
@@ -190,39 +193,45 @@ export default async function Home() {
     const generatedText = formatGenerated(data.generatedAt);
 
     return (
-      <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-10 px-4 py-12 sm:px-8">
-        <header className="space-y-5">
-          <Badge variant="outline" className="gap-2 border-orange-400/30 text-orange-500">
+      <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-8 px-4 py-8 sm:gap-10 sm:py-12 sm:px-8">
+        <header className="space-y-4 sm:space-y-5">
+          <Badge
+            variant="outline"
+            className="gap-1 border-orange-400/30 px-2 py-1 text-[11px] text-orange-500 sm:text-xs"
+          >
             Borderlands 4
           </Badge>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h1 className="flex items-center gap-3 text-3xl font-bold text-foreground sm:text-4xl">
-              <Gamepad className="h-7 w-7 text-orange-500" aria-hidden />
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground sm:gap-3 sm:text-4xl">
+              <Gamepad className="h-6 w-6 text-orange-500 sm:h-7 sm:w-7" aria-hidden />
               <span>
                 <span className="text-orange-500">SHiFT</span> Codes
               </span>
             </h1>
-            <Badge variant="accent" className="gap-2 normal-case">
+            <Badge
+              variant="accent"
+              className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
+            >
               Mungo Edition
             </Badge>
           </div>
-          <div className="flex flex-wrap items-center gap-4 rounded-xl border border-orange-400/20 bg-orange-400/10 p-4 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-orange-400/20 bg-orange-400/10 p-3 text-xs text-muted-foreground sm:gap-4 sm:p-4 sm:text-sm">
+            <span className="inline-flex items-center gap-2 whitespace-nowrap">
               <Clock className="h-4 w-4 text-orange-500" aria-hidden />
               <span>Aktualisiert {updatedText}</span>
             </span>
-            <span className="inline-flex items-center gap-2">
+            <span className="inline-flex items-center gap-2 whitespace-nowrap">
               <Barcode className="h-4 w-4 text-orange-500" aria-hidden />
               <span>
                 {data.count} aktive {data.count === 1 ? "Code" : "Codes"}
               </span>
             </span>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <Button
               asChild
               variant="outline"
-              className="rounded-full border-border/70 bg-background/80 px-4 py-2 text-sm text-foreground transition hover:border-orange-300 hover:text-orange-500"
+              className="rounded-full border-border/70 bg-background/80 px-3 py-1.5 text-xs text-foreground transition hover:border-orange-300 hover:text-orange-500 sm:px-4 sm:py-2 sm:text-sm"
             >
               <Link href="/bl4.txt" className="flex items-center gap-2">
                 <TextIcon className="h-4 w-4" aria-hidden />
@@ -232,7 +241,7 @@ export default async function Home() {
             <Button
               asChild
               variant="outline"
-              className="rounded-full border-border/70 bg-background/80 px-4 py-2 text-sm text-foreground transition hover:border-orange-300 hover:text-orange-500"
+              className="rounded-full border-border/70 bg-background/80 px-3 py-1.5 text-xs text-foreground transition hover:border-orange-300 hover:text-orange-500 sm:px-4 sm:py-2 sm:text-sm"
             >
               <Link href="/bl4.rss" className="flex items-center gap-2">
                 <RssFeed className="h-4 w-4" aria-hidden />
@@ -242,7 +251,7 @@ export default async function Home() {
             <Button
               asChild
               variant="outline"
-              className="rounded-full border-border/70 bg-background/80 px-4 py-2 text-sm text-foreground transition hover:border-orange-300 hover:text-orange-500"
+              className="rounded-full border-border/70 bg-background/80 px-3 py-1.5 text-xs text-foreground transition hover:border-orange-300 hover:text-orange-500 sm:px-4 sm:py-2 sm:text-sm"
             >
               <a
                 href="https://github.com/DankestMemeLord/autoshift-codes"
