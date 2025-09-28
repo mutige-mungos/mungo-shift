@@ -5,10 +5,11 @@ export const CODE_REGEX = /^[A-Z0-9]{5}(?:-[A-Z0-9]{5}){4}$/;
 
 export interface SanitizedCode {
   code: string;
-  added?: string;
+  archived?: string;
+  archivedRaw?: string;
   expires?: string;
   expiresRaw?: string;
-  addedRaw?: string;
+  expired?: boolean;
   reward?: string;
   source?: string;
 }
@@ -19,6 +20,45 @@ function pickString(value: unknown): string | undefined {
   }
 
   return undefined;
+}
+
+function pickBoolean(value: unknown): boolean | undefined {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const normalised = value.trim().toLowerCase();
+    if (normalised === "true") {
+      return true;
+    }
+    if (normalised === "false") {
+      return false;
+    }
+  }
+
+  if (typeof value === "number") {
+    if (value === 1) {
+      return true;
+    }
+    if (value === 0) {
+      return false;
+    }
+  }
+
+  return undefined;
+}
+
+function startOfDay(date: Date): number {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  return copy.getTime();
+}
+
+function endOfDay(date: Date): number {
+  const copy = new Date(date);
+  copy.setHours(23, 59, 59, 999);
+  return copy.getTime();
 }
 
 export function isBL4(entry: UpstreamEntry): boolean {
@@ -57,8 +97,8 @@ export function getExpiryIso(entry: UpstreamEntry): string | null {
   return parsed.toISOString();
 }
 
-export function getAddedIso(entry: UpstreamEntry): string | null {
-  const raw = pickString((entry as { added?: unknown }).added) ?? pickString(entry.archived);
+export function getArchivedIso(entry: UpstreamEntry): string | null {
+  const raw = pickString(entry.archived);
   if (!raw) {
     return null;
   }
@@ -72,6 +112,11 @@ export function getAddedIso(entry: UpstreamEntry): string | null {
 }
 
 export function isActive(entry: UpstreamEntry, now: Date = new Date()): boolean {
+  const expiredFlag = pickBoolean((entry as { expired?: unknown }).expired);
+  if (expiredFlag === true) {
+    return false;
+  }
+
   const raw = pickString(entry.expires) ?? pickString(entry.expiry);
   if (!raw) {
     return true;
@@ -82,7 +127,10 @@ export function isActive(entry: UpstreamEntry, now: Date = new Date()): boolean 
     return true;
   }
 
-  return parsed.getTime() >= now.getTime();
+  const today = startOfDay(now);
+  const expiryDay = endOfDay(parsed);
+
+  return today <= expiryDay;
 }
 
 export function sanitize(entry: UpstreamEntry, code?: string): SanitizedCode | null {
@@ -93,17 +141,19 @@ export function sanitize(entry: UpstreamEntry, code?: string): SanitizedCode | n
 
   const rawExpires = pickString(entry.expires) ?? pickString(entry.expiry) ?? undefined;
   const expires = getExpiryIso(entry) ?? undefined;
-  const rawAdded = pickString((entry as { added?: unknown }).added) ?? pickString(entry.archived) ?? undefined;
-  const added = getAddedIso(entry) ?? undefined;
+  const rawArchived = pickString(entry.archived) ?? undefined;
+  const archived = getArchivedIso(entry) ?? undefined;
+  const expired = pickBoolean((entry as { expired?: unknown }).expired);
   const reward = pickString(entry.reward) ?? pickString(entry.prize) ?? undefined;
   const source = pickString(entry.source) ?? undefined;
 
   const sanitized: SanitizedCode = {
     code: extracted,
-    added,
+    archived,
     expires,
     expiresRaw: rawExpires,
-    addedRaw: rawAdded,
+    archivedRaw: rawArchived,
+    expired,
     reward,
     source,
   };

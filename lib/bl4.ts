@@ -1,4 +1,5 @@
 import { fetchUpstream } from "./fetchUpstream";
+import type { UpstreamEntry } from "./fetchUpstream";
 import {
   extractCode,
   isActive,
@@ -16,18 +17,18 @@ export interface Bl4Data {
 
 function sortCodes(items: SanitizedCode[]): SanitizedCode[] {
   return [...items].sort((a, b) => {
-    const aAdded = a.added ? new Date(a.added).getTime() : null;
-    const bAdded = b.added ? new Date(b.added).getTime() : null;
+    const aArchived = a.archived ? new Date(a.archived).getTime() : null;
+    const bArchived = b.archived ? new Date(b.archived).getTime() : null;
 
-    if (aAdded !== null && bAdded !== null) {
-      return bAdded - aAdded;
+    if (aArchived !== null && bArchived !== null) {
+      return bArchived - aArchived;
     }
 
-    if (aAdded !== null) {
+    if (aArchived !== null) {
       return -1;
     }
 
-    if (bAdded !== null) {
+    if (bArchived !== null) {
       return 1;
     }
 
@@ -49,10 +50,6 @@ export async function loadActiveBl4Codes(options: {
       continue;
     }
 
-    if (!isActive(entry, now)) {
-      continue;
-    }
-
     const code = extractCode(entry);
     if (!code) {
       continue;
@@ -67,6 +64,17 @@ export async function loadActiveBl4Codes(options: {
   }
 
   const items = sortCodes(Array.from(map.values()));
+  const activeCount = items.reduce((count, item) => {
+    const entry: UpstreamEntry = {};
+    if (item.expires) {
+      entry.expires = item.expires;
+    }
+    if (typeof item.expired !== "undefined") {
+      entry.expired = item.expired;
+    }
+
+    return isActive(entry, now) ? count + 1 : count;
+  }, 0);
 
   let generatedIso: string | undefined;
   if (generatedAt) {
@@ -79,7 +87,7 @@ export async function loadActiveBl4Codes(options: {
   return {
     updatedAt: new Date(fetchedAt).toISOString(),
     generatedAt: generatedIso,
-    count: items.length,
+    count: activeCount,
     items,
   };
 }

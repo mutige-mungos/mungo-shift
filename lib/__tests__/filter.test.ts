@@ -52,6 +52,17 @@ describe("isActive", () => {
     expect(isActive({ expires: "2024-02-01" }, now)).toBe(true);
   });
 
+  it("respects explicit expired flag", () => {
+    expect(isActive({ expired: true }, now)).toBe(false);
+    expect(isActive({ expired: false }, now)).toBe(true);
+  });
+
+  it("keeps codes active through the entire expiry day", () => {
+    const expires = new Date("2024-01-02T00:00:00.000Z").toISOString();
+    expect(isActive({ expires }, new Date("2024-01-02T10:00:00.000Z"))).toBe(true);
+    expect(isActive({ expires }, new Date("2024-01-03T00:00:00.000Z"))).toBe(false);
+  });
+
   it("returns false when expiry is in the past", () => {
     expect(isActive({ expiry: "2023-12-31" }, now)).toBe(false);
   });
@@ -74,10 +85,11 @@ describe("sanitize", () => {
     const sanitized = sanitize(entry);
     const expected: SanitizedCode = {
       code: "AAAAA-BBBBB-CCCCC-DDDDD-EEEEE",
-      added: undefined,
+      archived: undefined,
+      archivedRaw: undefined,
       expires: "2025-01-01T00:00:00.000Z",
       expiresRaw: "2025-01-01T00:00:00Z",
-      addedRaw: undefined,
+      expired: undefined,
       reward: "5 Golden Keys",
       source: "https://example.com",
     };
@@ -85,7 +97,7 @@ describe("sanitize", () => {
     expect(sanitized).toEqual(expected);
   });
 
-  it("parses added timestamps", () => {
+  it("parses archived timestamps", () => {
     const entry: UpstreamEntry = {
       game: "Borderlands 4",
       code: "aaaaa-bbbbb-ccccc-ddddd-eeeee",
@@ -93,7 +105,19 @@ describe("sanitize", () => {
     };
 
     const sanitized = sanitize(entry);
-    expect(sanitized?.added).toBe("2025-09-20T07:26:24.013Z");
+    expect(sanitized?.archived).toBe("2025-09-20T07:26:24.013Z");
+    expect(sanitized?.archivedRaw).toBe("2025-09-20 07:26:24.013778+00:00");
+  });
+
+  it("parses expired flag", () => {
+    const entry: UpstreamEntry = {
+      game: "Borderlands 4",
+      code: "aaaaa-bbbbb-ccccc-ddddd-eeeee",
+      expired: "true",
+    };
+
+    const sanitized = sanitize(entry);
+    expect(sanitized?.expired).toBe(true);
   });
 
   it("returns null when no valid code", () => {
