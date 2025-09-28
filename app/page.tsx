@@ -52,6 +52,18 @@ function formatDateOnly(timestamp?: string): string | null {
   }).format(parsed);
 }
 
+function getTodayStart(): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today.getTime();
+}
+
+function getEndOfDay(date: Date): number {
+  const copy = new Date(date);
+  copy.setHours(23, 59, 59, 999);
+  return copy.getTime();
+}
+
 function isExpiredDate(timestamp?: string): boolean {
   if (!timestamp) {
     return false;
@@ -62,7 +74,7 @@ function isExpiredDate(timestamp?: string): boolean {
     return false;
   }
 
-  return parsed.getTime() < Date.now();
+  return getTodayStart() > getEndOfDay(parsed);
 }
 
 function formatGenerated(timestamp?: string): string | null {
@@ -129,11 +141,12 @@ function CodesList({
   return (
     <ul className="space-y-4 sm:space-y-6">
       {codes.map((item) => {
-        const addedFormatted = formatDateOnly(item.added);
+        const archivedFormatted = formatDateOnly(item.archived);
+        const archivedDisplay = archivedFormatted ?? "???";
         const expiresFormatted = formatDateOnly(item.expires);
-        const addedDisplay = addedFormatted ?? "unbekannt";
-        const expiresDisplay = expiresFormatted ?? "unbekannt";
-        const expired = isExpiredDate(item.expires);
+        const expiresDisplay = expiresFormatted ?? "???";
+        const expiredFlag = item.expired === true;
+        const expired = expiredFlag || isExpiredDate(item.expires);
 
         const reward = item.reward ? (
           <InfoChip
@@ -146,21 +159,21 @@ function CodesList({
           <UnknownIndicator />
         );
 
-        const addedChip = (
+        const archivedChip = (
           <InfoChip
             icon={<Calendar className="h-4 w-4" aria-hidden />}
-            title="Hinzugefügt am"
+            title="Archiviert am"
           >
-            {`Hinzugefügt am: ${addedDisplay}`}
+            {archivedDisplay}
           </InfoChip>
         );
 
         const expiresChip = (
           <InfoChip
             icon={<Clock className="h-4 w-4" aria-hidden />}
-            title="Ablaufdatum"
+            title="Bis"
           >
-            {`Ablaufdatum: ${expiresDisplay}`}
+            {`Bis: ${expiresDisplay}`}
           </InfoChip>
         );
 
@@ -184,9 +197,9 @@ function CodesList({
                     {expired ? (
                       <Badge
                         variant="subtle"
-                        className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
+                        className="gap-1 px-2 py-1 text-[11px] normal-case text-red-500 border-red-500/40 bg-red-500/10 sm:text-xs"
                       >
-                        Abgelaufen
+                        Inactive
                       </Badge>
                     ) : (
                       <Badge
@@ -218,7 +231,7 @@ function CodesList({
                 )}
               >
                 {reward}
-                {addedChip}
+                {archivedChip}
                 {expiresChip}
               </CardContent>
             </Card>
