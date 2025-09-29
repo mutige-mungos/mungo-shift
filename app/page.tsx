@@ -5,7 +5,6 @@ import {
   Barcode,
   Calendar,
   Clock,
-  Gamepad,
   HelpCircle,
   Key as KeyIcon,
   RssFeed,
@@ -19,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { loadActiveBl4Codes } from "@/lib/bl4";
 import { cn } from "@/lib/utils";
+import { ShiftLogoIcon } from "@/components/shift-logo-icon";
 
 function formatUpdated(timestamp: string): string {
   const parsed = new Date(timestamp);
@@ -186,11 +186,14 @@ function CodesList({
                   "border-border/40 bg-muted/70 opacity-70 hover:-translate-y-0 hover:border-border/40 hover:shadow-none",
               )}
             >
-              <CardHeader
-                className={cn("space-y-3 sm:space-y-4", expired && "line-through")}
-              >
+              <CardHeader className="space-y-3 sm:space-y-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <span className="flex items-center gap-2 font-mono text-base font-semibold tracking-[0.18em] text-foreground sm:text-xl sm:tracking-[0.35em]">
+                  <span
+                    className={cn(
+                      "flex items-center gap-2 font-mono text-base font-semibold tracking-[0.18em] text-foreground sm:text-xl sm:tracking-[0.35em]",
+                      expired && "line-through decoration-2 decoration-red-400",
+                    )}
+                  >
                     {item.code}
                   </span>
                   <div className="flex items-center gap-1.5 sm:gap-2">
@@ -224,12 +227,7 @@ function CodesList({
                   </Link>
                 ) : null}
               </CardHeader>
-              <CardContent
-                className={cn(
-                  "flex flex-wrap gap-2 text-xs sm:gap-3 sm:text-sm",
-                  expired && "line-through",
-                )}
-              >
+              <CardContent className="flex flex-wrap gap-2 text-xs sm:gap-3 sm:text-sm">
                 {reward}
                 {archivedChip}
                 {expiresChip}
@@ -259,7 +257,10 @@ export default async function Home() {
           </Badge>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground sm:gap-3 sm:text-4xl">
-              <Gamepad className="h-6 w-6 text-orange-500 sm:h-7 sm:w-7" aria-hidden />
+              <ShiftLogoIcon
+                className="h-6 w-6 text-orange-500 sm:h-7 sm:w-7"
+                aria-hidden
+              />
               <span>
                 <span className="text-orange-500">SHiFT</span> Codes
               </span>
@@ -283,51 +284,42 @@ export default async function Home() {
               </span>
             </span>
           </div>
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            <Button
-              asChild
-              variant="outline"
-              className="rounded-full border-border/70 bg-background/80 px-3 py-1.5 text-xs text-foreground transition hover:border-orange-300 hover:text-orange-500 sm:px-4 sm:py-2 sm:text-sm"
-            >
-              <Link href="/bl4.txt" className="flex items-center gap-2">
-                <TextIcon className="h-4 w-4" aria-hidden />
-                Plain text export
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="rounded-full border-border/70 bg-background/80 px-3 py-1.5 text-xs text-foreground transition hover:border-orange-300 hover:text-orange-500 sm:px-4 sm:py-2 sm:text-sm"
-            >
-              <Link href="/bl4.rss" className="flex items-center gap-2">
-                <RssFeed className="h-4 w-4" aria-hidden />
-                RSS feed
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="rounded-full border-border/70 bg-background/80 px-3 py-1.5 text-xs text-foreground transition hover:border-orange-300 hover:text-orange-500 sm:px-4 sm:py-2 sm:text-sm"
-            >
-            <a
-              href="https://github.com/XxUnkn0wnxX/autoshift-codes"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
-            >
-                <ArrowUpRight className="h-4 w-4" aria-hidden />
-                Upstream feed
-              </a>
-            </Button>
-          </div>
         </header>
         <CodesList codes={data.items} />
-        <footer className="mt-auto border-t border-muted pt-4 text-xs text-muted-foreground">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <span>Quelle aktuallisier {generatedText ?? "Unbekannt"}</span>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <ThemeToggle />
-              <span className="sm:text-right">(C) 2025 Mutige Mungos</span>
+        <footer className="mt-auto border-t border-muted pt-6 text-xs text-muted-foreground sm:pt-8">
+          <div className="grid gap-6 sm:grid-cols-2 sm:items-start">
+            <div className="space-y-3">
+              <span className="block text-sm text-muted-foreground">
+                Quelle aktualisiert {generatedText ?? "Unbekannt"}
+              </span>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="rounded-full border-border/70 bg-background/80 px-3 py-1.5 text-xs text-foreground transition hover:border-orange-300 hover:text-orange-500 sm:px-4 sm:py-2 sm:text-sm"
+                >
+                  <Link href="/bl4.txt" className="flex items-center gap-2">
+                    <TextIcon className="h-4 w-4" aria-hidden />
+                    Plain text export
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="rounded-full border-border/70 bg-background/80 px-3 py-1.5 text-xs text-foreground transition hover:border-orange-300 hover:text-orange-500 sm:px-4 sm:py-2 sm:text-sm"
+                >
+                  <Link href="/bl4.rss" className="flex items-center gap-2">
+                    <RssFeed className="h-4 w-4" aria-hidden />
+                    RSS feed
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            <div className="flex flex-col items-start gap-3 text-sm sm:items-end">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <ThemeToggle />
+                <span>(C) 2025 Mutige Mungos</span>
+              </div>
             </div>
           </div>
         </footer>
