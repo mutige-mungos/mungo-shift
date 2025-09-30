@@ -2,8 +2,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-export interface ShiftLogoIconProps
-  extends React.SVGProps<SVGSVGElement> {}
+export type ShiftLogoIconProps = React.SVGProps<SVGSVGElement>;
 
 export const ShiftLogoIcon = React.forwardRef<SVGSVGElement, ShiftLogoIconProps>(
   ({ className, ...props }, ref) => (
