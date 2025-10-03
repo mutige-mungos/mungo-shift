@@ -3,6 +3,7 @@ import { Barcode, Clock } from "iconoir-react";
 import { Footer } from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
 import { CodesSection } from "@/components/codes-section";
+import { HeaderActions } from "@/components/header-actions";
 import { loadActiveBl4Codes } from "@/lib/bl4";
 import { ShiftLogoIcon } from "@/components/shift-logo-icon";
 
@@ -34,7 +35,7 @@ export default async function Home() {
           >
             Borderlands 4
           </Badge>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground sm:gap-3 sm:text-4xl">
               <ShiftLogoIcon
                 className="h-6 w-6 text-orange-500 sm:h-7 sm:w-7"
@@ -44,6 +45,7 @@ export default async function Home() {
                 <span className="text-orange-500">SHiFT</span> Codes
               </span>
             </h1>
+            <HeaderActions className="self-end sm:self-auto" />
           </div>
           <div className="flex flex-wrap items-center gap-3 rounded-xl border border-orange-400/20 bg-orange-400/10 p-3 text-xs text-muted-foreground sm:gap-4 sm:p-4 sm:text-sm">
             <span className="inline-flex items-center gap-2 whitespace-nowrap">
