@@ -20,10 +20,12 @@ import {
 } from "iconoir-react";
 
 import { CopyButton } from "@/components/copy-button";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { SanitizedCode } from "@/lib/filter";
+import { GearboxIcon } from "@/components/gearbox-icon";
 
 type CodeFilter = "all" | "active" | "expired";
 
@@ -35,7 +37,7 @@ type FilterOption = {
 
 const FILTER_OPTIONS: FilterOption[] = [
   { id: "all", label: "Alle", icon: List },
-  { id: "active", label: "Aktiv", icon: CheckCircle },
+  { id: "active", label: "Verfügbar", icon: CheckCircle },
   { id: "expired", label: "Abgelaufen", icon: WarningCircle },
 ];
 
@@ -88,7 +90,10 @@ function formatDateOnly(timestamp?: string): string | null {
 function UnknownIndicator({ label = "unbekannt" }: { label?: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-2.5 py-1.5 text-xs text-muted-foreground sm:gap-2 sm:px-3 sm:py-2 sm:text-sm">
-      <HelpCircle className="h-3.5 w-3.5 text-orange-500 sm:h-4 sm:w-4" aria-hidden />
+      <HelpCircle
+        className="h-3.5 w-3.5 text-orange-500 sm:h-4 sm:w-4"
+        aria-hidden
+      />
       <span className="font-medium text-foreground">{label}</span>
     </span>
   );
@@ -167,7 +172,7 @@ function CodesList({ codes }: { codes: SanitizedCode[] }) {
               className={cn(
                 "overflow-hidden border-border/60 bg-card/80 transition-all hover:-translate-y-0.5 hover:border-orange-300/70 hover:shadow-lg",
                 expired &&
-                  "border-border/40 bg-muted/70 opacity-70 hover:-translate-y-0 hover:border-border/40 hover:shadow-none",
+                  "border-border/40 bg-muted/70 opacity-70 hover:-translate-y-0 hover:border-border/40 hover:shadow-none"
               )}
             >
               <CardHeader className="space-y-3 sm:space-y-4">
@@ -175,7 +180,7 @@ function CodesList({ codes }: { codes: SanitizedCode[] }) {
                   <span
                     className={cn(
                       "flex items-center gap-2 font-mono text-base font-semibold tracking-[0.18em] text-foreground sm:text-xl sm:tracking-[0.35em]",
-                      expired && "line-through decoration-2 decoration-red-400",
+                      expired && "line-through decoration-2 decoration-red-400"
                     )}
                   >
                     {item.code}
@@ -186,14 +191,14 @@ function CodesList({ codes }: { codes: SanitizedCode[] }) {
                         variant="subtle"
                         className="gap-1 px-2 py-1 text-[11px] normal-case text-red-500 border-red-500/40 bg-red-500/10 sm:text-xs"
                       >
-                        Inactive
+                        Abgelaufen
                       </Badge>
                     ) : (
                       <Badge
                         variant="success"
                         className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
                       >
-                        Active
+                        Verfügbar
                       </Badge>
                     )}
                     <CopyButton value={item.code} />
@@ -203,10 +208,19 @@ function CodesList({ codes }: { codes: SanitizedCode[] }) {
                   <Link
                     href={item.source}
                     className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-orange-500 sm:text-sm"
-                    target={item.source.startsWith("http") ? "_blank" : undefined}
-                    rel={item.source.startsWith("http") ? "noopener noreferrer" : undefined}
+                    target={
+                      item.source.startsWith("http") ? "_blank" : undefined
+                    }
+                    rel={
+                      item.source.startsWith("http")
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
                   >
-                    <ArrowUpRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden />
+                    <ArrowUpRight
+                      className="h-3 w-3 sm:h-3.5 sm:w-3.5"
+                      aria-hidden
+                    />
                     <span className="font-medium">Quelle ansehen</span>
                   </Link>
                 ) : null}
@@ -240,6 +254,21 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
 
   return (
     <section className="space-y-5 sm:space-y-6">
+      <div className="flex justify-start">
+        <Button
+          asChild
+          className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-white shadow-sm transition hover:bg-orange-500/90 focus-visible:ring-orange-500"
+        >
+          <Link
+            href="https://shift.gearboxsoftware.com/rewards"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <GearboxIcon className="h-5 w-5" />
+            <span>Code einlösen</span>
+          </Link>
+        </Button>
+      </div>
       <div className="flex flex-wrap items-center gap-2 rounded-full border border-border/60 bg-muted/40 p-2">
         {FILTER_OPTIONS.map(({ id, label, icon: Icon }) => {
           const isActive = activeFilter === id;
@@ -251,7 +280,7 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
               className={cn(
                 "inline-flex items-center gap-2 rounded-full border border-transparent px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:text-foreground sm:px-4 sm:py-2",
                 isActive &&
-                  "border-border/70 bg-background/90 text-foreground shadow-sm",
+                  "border-border/70 bg-background/90 text-foreground shadow-sm"
               )}
               aria-pressed={isActive}
             >
