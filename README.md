@@ -33,6 +33,8 @@ The app boots on [http://localhost:3000](http://localhost:3000). The landing pag
 | `DATABASE_URL` | No | Path or `file:` URL pointing to where seen codes should be persisted. Defaults to `.data/seen.json`. |
 | `CRON_SECRET` | No | Bearer token required to call the cron endpoint. |
 | `SITE_URL` | No | Absolute site URL used for RSS metadata and Open Graph tags. |
+| `NEXT_PUBLIC_MATOMO_URL` | No | Base URL for your Matomo instance (e.g. `https://analytics.example.com`). Enables client-side analytics when paired with the site ID. |
+| `NEXT_PUBLIC_MATOMO_SITE_ID` | No | Numeric Matomo site ID that should receive events. |
 
 Create a `.env.local` if you need to set these while developing.
 

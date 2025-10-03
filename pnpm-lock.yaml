@@ -11,6 +11,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.3
         version: 1.2.3(@types/react@19.1.13)(react@19.1.0)
+      '@socialgouv/matomo-next':
+        specifier: ^1.9.2
+        version: 1.9.2(next@15.5.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -644,6 +647,11 @@ packages:
 
   '@rushstack/eslint-patch@1.12.0':
     resolution: {integrity: sha512-5EwMtOqvJMMa3HbmxLlF74e+3/HhwBTMcvt3nqVJgGCozO6hzIPOBlwm8mGVNR9SN2IJpxSnlxczyDjcn7qIyw==}
+
+  '@socialgouv/matomo-next@1.9.2':
+    resolution: {integrity: sha512-UtiOBAzKiCwal6/2Lfh3fnv9L8XC4Ovdqqh1K3fimJZJhodf18fD3oy3ansGpgj+A7YE8HPV7/u/q6cYbRP3nw==}
+    peerDependencies:
+      next: '>= 9.5.5'
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
@@ -2704,6 +2712,10 @@ snapshots:
   '@rtsao/scc@1.1.0': {}
 
   '@rushstack/eslint-patch@1.12.0': {}
+
+  '@socialgouv/matomo-next@1.9.2(next@15.5.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
+    dependencies:
+      next: 15.5.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   '@swc/helpers@0.5.15':
     dependencies:
