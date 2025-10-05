@@ -20,12 +20,10 @@ import {
 } from "iconoir-react";
 
 import { CopyButton } from "@/components/copy-button";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { SanitizedCode } from "@/lib/filter";
-import { GearboxIcon } from "@/components/gearbox-icon";
 
 type CodeFilter = "all" | "active" | "expired";
 
@@ -254,21 +252,6 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
 
   return (
     <section className="space-y-5 sm:space-y-6">
-      <div className="flex justify-start">
-        <Button
-          asChild
-          className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-white shadow-sm transition hover:bg-orange-500/90 focus-visible:ring-orange-500"
-        >
-          <Link
-            href="https://shift.gearboxsoftware.com/rewards"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GearboxIcon className="h-5 w-5" />
-            <span>Code einlösen</span>
-          </Link>
-        </Button>
-      </div>
       <div className="flex flex-wrap items-center gap-2 rounded-full border border-border/60 bg-muted/40 p-2">
         {FILTER_OPTIONS.map(({ id, label, icon: Icon }) => {
           const isActive = activeFilter === id;

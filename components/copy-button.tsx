@@ -32,7 +32,7 @@ export function CopyButton({ value }: CopyButtonProps) {
       console.error("Failed to copy code", error);
       setCopied(false);
     }
-  }, [value]);
+  }, [notifyCopy, value]);
 
   return (
     <Button

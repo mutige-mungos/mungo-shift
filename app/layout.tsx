@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { MatomoAnalytics } from "@/components/matomo-analytics";
 import { CopyNotificationProvider } from "@/components/copy-notification-provider";
+import { Navbar } from "@/components/navbar";
 
 import "./globals.css";
 
@@ -38,6 +39,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background text-foreground antialiased`}>
         <ThemeProvider>
           <CopyNotificationProvider>
+            <Navbar />
             <MatomoAnalytics />
             {children}
           </CopyNotificationProvider>
