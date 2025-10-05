@@ -32,16 +32,18 @@ interface NavLinkProps {
   href: string;
   isActive?: boolean;
   children: React.ReactNode;
+  className?: string;
 }
 
-function NavLink({ href, isActive, children }: NavLinkProps) {
+function NavLink({ href, isActive, children, className }: NavLinkProps) {
   return (
     <Link
       href={href}
       className={cn(
-        "rounded-full px-3 py-1 text-sm font-medium transition-colors",
+        "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors",
         "text-muted-foreground hover:text-foreground",
-        isActive && "bg-orange-500/20 text-foreground"
+        isActive && "bg-orange-500/20 text-foreground",
+        className,
       )}
     >
       {children}
@@ -89,7 +91,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <nav className="mx-auto w-full max-w-4xl px-4 py-4 sm:px-8 md:py-5">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
           <Link
             href="/"
             className="flex items-center gap-2 text-sm font-semibold text-foreground"
@@ -104,7 +106,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:gap-3">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
             <NavLink href="/" isActive={pathname === "/"}>
               Home
             </NavLink>
@@ -160,7 +162,7 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-2">
+          <div className="flex flex-wrap items-center gap-2 md:gap-2">
             <Button
               asChild
               className="inline-flex items-center justify-center rounded-full bg-orange-500 px-4 py-2 text-xs font-semibold text-white shadow transition-colors hover:bg-orange-500/90 sm:text-sm"
