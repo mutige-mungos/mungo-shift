@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Check, Copy as CopyIcon } from "iconoir-react";
 
 import { Button } from "@/components/ui/button";
+import { useCopyNotification } from "@/components/copy-notification-provider";
 
 export interface CopyButtonProps {
   value: string;
@@ -11,6 +12,7 @@ export interface CopyButtonProps {
 
 export function CopyButton({ value }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
+  const { notifyCopy } = useCopyNotification();
 
   useEffect(() => {
     if (!copied) {
@@ -25,6 +27,7 @@ export function CopyButton({ value }: CopyButtonProps) {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
+      notifyCopy(`Code ${value} wurde kopiert`);
     } catch (error) {
       console.error("Failed to copy code", error);
       setCopied(false);
