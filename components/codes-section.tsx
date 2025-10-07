@@ -15,6 +15,7 @@ import {
   Clock,
   HelpCircle,
   Key as KeyIcon,
+  Shirt,
   List,
   WarningCircle,
 } from "iconoir-react";
@@ -137,7 +138,13 @@ function CodesList({ codes }: { codes: SanitizedCode[] }) {
 
         const reward = item.reward ? (
           <InfoChip
-            icon={<KeyIcon className="h-4 w-4" aria-hidden />}
+            icon={
+              item.reward.toLowerCase().includes("cosmetic") ? (
+                <Shirt className="h-4 w-4" aria-hidden />
+              ) : (
+                <KeyIcon className="h-4 w-4" aria-hidden />
+              )
+            }
             title="Belohnung"
           >
             {item.reward}
