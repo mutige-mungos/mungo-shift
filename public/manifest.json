@@ -1,0 +1,28 @@
+{
+  "name": "Mutige Mungos - SHiFT Codes",
+  "short_name": "Mutige Mungos - SHiFT Codes",
+  "description": "Heilige Claptrap-Schaltkreise! Die Mutigen Mungos haben das Chaos gezähmt: alle Borderlands SHiFT Codes, brandaktuell, sortiert und bereit, dein Inventar mit Gold Keys zu fluten.",
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ]
+}

@@ -27,6 +27,13 @@ export const metadata: Metadata = {
   description:
     "Live Borderlands 4 SHiFT codes with expiry tracking, exports, and notifications.",
   ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({
