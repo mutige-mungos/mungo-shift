@@ -59,7 +59,7 @@ export function CopyNotificationProvider({
       <div className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">
         <div
           className={cn(
-            "transform-gpu rounded-full border border-orange-400/40 bg-orange-500/90 px-5 py-2 text-sm font-medium text-white shadow-lg transition-all",
+            "transform-gpu rounded-full border border-emerald-400/40 bg-emerald-500/90 px-5 py-2 text-sm font-medium text-white shadow-lg transition-all",
             message ? "opacity-100" : "pointer-events-none opacity-0 -translate-y-2",
           )}
           aria-live="polite"
