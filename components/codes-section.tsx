@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import {
+  useEffect,
   useMemo,
   useState,
+  useCallback,
   type ComponentPropsWithoutRef,
   type ComponentType,
   type ReactNode,
@@ -25,6 +27,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { SanitizedCode } from "@/lib/filter";
+
+const COPIED_CODES_STORAGE_KEY = "copiedCodes";
+const KNOWN_CODES_STORAGE_KEY = "knownCodes";
+const SESSION_NEW_CODES_STORAGE_KEY = `${KNOWN_CODES_STORAGE_KEY}:session-new`;
 
 type CodeFilter = "all" | "active" | "expired";
 
@@ -118,7 +124,19 @@ function InfoChip({
   );
 }
 
-function CodesList({ codes }: { codes: SanitizedCode[] }) {
+type CodesListProps = {
+  codes: SanitizedCode[];
+  copiedCodes: Set<string>;
+  newCodes: Set<string>;
+  onCodeCopied: (code: string) => void;
+};
+
+function CodesList({
+  codes,
+  copiedCodes,
+  newCodes,
+  onCodeCopied,
+}: CodesListProps) {
   if (codes.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-muted bg-muted/60 p-6 text-sm text-muted-foreground">
@@ -171,6 +189,9 @@ function CodesList({ codes }: { codes: SanitizedCode[] }) {
           </InfoChip>
         );
 
+        const hasBeenCopied = copiedCodes.has(item.code);
+        const isNewCode = newCodes.has(item.code);
+
         return (
           <li key={item.code}>
             <Card
@@ -191,6 +212,14 @@ function CodesList({ codes }: { codes: SanitizedCode[] }) {
                     {item.code}
                   </span>
                   <div className="flex items-center gap-1.5 sm:gap-2">
+                    {isNewCode ? (
+                      <Badge
+                        variant="accent"
+                        className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
+                      >
+                        NEU
+                      </Badge>
+                    ) : null}
                     {expired ? (
                       <Badge
                         variant="subtle"
@@ -206,7 +235,11 @@ function CodesList({ codes }: { codes: SanitizedCode[] }) {
                         Verfügbar
                       </Badge>
                     )}
-                    <CopyButton value={item.code} />
+                    <CopyButton
+                      value={item.code}
+                      initiallyCopied={hasBeenCopied}
+                      onCopied={() => onCodeCopied(item.code)}
+                    />
                   </div>
                 </div>
                 {item.source ? (
@@ -245,6 +278,109 @@ function CodesList({ codes }: { codes: SanitizedCode[] }) {
 
 export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
   const [activeFilter, setActiveFilter] = useState<CodeFilter>("all");
+  const [copiedCodes, setCopiedCodes] = useState<Set<string>>(new Set());
+  const [newCodes, setNewCodes] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const readStoredSet = (storage: Storage, key: string) => {
+      try {
+        const raw = storage.getItem(key);
+        if (!raw) {
+          return new Set<string>();
+        }
+
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+          return new Set<string>();
+        }
+
+        return new Set<string>(
+          parsed.filter((value): value is string => typeof value === "string")
+        );
+      } catch (error) {
+        console.error(`Failed to read ${key} from storage`, error);
+        return new Set<string>();
+      }
+    };
+
+    const writeStoredSet = (
+      storage: Storage,
+      key: string,
+      values: Set<string>
+    ) => {
+      try {
+        if (values.size === 0) {
+          storage.removeItem(key);
+          return;
+        }
+
+        storage.setItem(key, JSON.stringify(Array.from(values)));
+      } catch (error) {
+        console.error(`Failed to write ${key} to storage`, error);
+      }
+    };
+
+    const localStorageRef = window.localStorage;
+    const sessionStorageRef = window.sessionStorage;
+
+    const currentCopied = readStoredSet(
+      localStorageRef,
+      COPIED_CODES_STORAGE_KEY
+    );
+    setCopiedCodes(currentCopied);
+
+    const storedKnown = readStoredSet(localStorageRef, KNOWN_CODES_STORAGE_KEY);
+    const codesOnPage = codes.map((item) => item.code);
+    const unseenCodes = codesOnPage.filter((code) => !storedKnown.has(code));
+
+    const sessionNewCodes = readStoredSet(
+      sessionStorageRef,
+      SESSION_NEW_CODES_STORAGE_KEY
+    );
+    const nextNewCodes = new Set(sessionNewCodes);
+
+    if (unseenCodes.length > 0) {
+      const updatedKnown = new Set(storedKnown);
+      unseenCodes.forEach((code) => {
+        updatedKnown.add(code);
+        nextNewCodes.add(code);
+      });
+
+      writeStoredSet(localStorageRef, KNOWN_CODES_STORAGE_KEY, updatedKnown);
+    }
+
+    writeStoredSet(
+      sessionStorageRef,
+      SESSION_NEW_CODES_STORAGE_KEY,
+      nextNewCodes
+    );
+
+    setNewCodes(nextNewCodes);
+  }, [codes]);
+
+  const handleCodeCopied = useCallback((code: string) => {
+    setCopiedCodes((prev) => {
+      if (prev.has(code)) {
+        return prev;
+      }
+
+      const next = new Set(prev);
+      next.add(code);
+
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(
+          COPIED_CODES_STORAGE_KEY,
+          JSON.stringify(Array.from(next))
+        );
+      }
+
+      return next;
+    });
+  }, []);
 
   const filteredCodes = useMemo(() => {
     switch (activeFilter) {
@@ -280,7 +416,12 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
           );
         })}
       </div>
-      <CodesList codes={filteredCodes} />
+      <CodesList
+        codes={filteredCodes}
+        copiedCodes={copiedCodes}
+        newCodes={newCodes}
+        onCodeCopied={handleCodeCopied}
+      />
     </section>
   );
 }
