@@ -124,6 +124,26 @@ function InfoChip({
   );
 }
 
+function WeaponIcon(props: ComponentPropsWithoutRef<"svg">) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M3 12h6.5l1.4 3H18l2-3-2-3h-6.4l-1.3 3H7.5" />
+      <path d="M7.5 12v3H5.5v-3" />
+      <path d="M18 9v6" />
+    </svg>
+  );
+}
+
 type CodesListProps = {
   codes: SanitizedCode[];
   copiedCodes: Set<string>;
@@ -159,6 +179,8 @@ function CodesList({
             icon={
               item.reward.toLowerCase().includes("cosmetic") ? (
                 <Shirt className="h-4 w-4" aria-hidden />
+              ) : item.reward.toLowerCase().includes("weapon") ? (
+                <WeaponIcon className="h-4 w-4" />
               ) : (
                 <KeyIcon className="h-4 w-4" aria-hidden />
               )
