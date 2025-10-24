@@ -30,7 +30,6 @@ import type { SanitizedCode } from "@/lib/filter";
 
 const COPIED_CODES_STORAGE_KEY = "copiedCodes";
 const KNOWN_CODES_STORAGE_KEY = "knownCodes";
-const SESSION_NEW_CODES_STORAGE_KEY = `${KNOWN_CODES_STORAGE_KEY}:session-new`;
 
 type CodeFilter = "all" | "active" | "expired";
 
@@ -347,7 +346,6 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
     };
 
     const localStorageRef = window.localStorage;
-    const sessionStorageRef = window.sessionStorage;
 
     const currentCopied = readStoredSet(
       localStorageRef,
@@ -359,29 +357,17 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
     const codesOnPage = codes.map((item) => item.code);
     const unseenCodes = codesOnPage.filter((code) => !storedKnown.has(code));
 
-    const sessionNewCodes = readStoredSet(
-      sessionStorageRef,
-      SESSION_NEW_CODES_STORAGE_KEY
-    );
-    const nextNewCodes = new Set(sessionNewCodes);
+    const nextNewCodes = new Set(unseenCodes);
+    setNewCodes(nextNewCodes);
 
     if (unseenCodes.length > 0) {
       const updatedKnown = new Set(storedKnown);
       unseenCodes.forEach((code) => {
         updatedKnown.add(code);
-        nextNewCodes.add(code);
       });
 
       writeStoredSet(localStorageRef, KNOWN_CODES_STORAGE_KEY, updatedKnown);
     }
-
-    writeStoredSet(
-      sessionStorageRef,
-      SESSION_NEW_CODES_STORAGE_KEY,
-      nextNewCodes
-    );
-
-    setNewCodes(nextNewCodes);
   }, [codes]);
 
   const handleCodeCopied = useCallback((code: string) => {
