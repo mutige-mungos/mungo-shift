@@ -13,6 +13,7 @@ import {
 import {
   ArrowUpRight,
   Calendar,
+  Check,
   CheckCircle,
   Clock,
   HelpCircle,
@@ -93,7 +94,7 @@ function formatDateOnly(timestamp?: string): string | null {
 
 function UnknownIndicator({ label = "unbekannt" }: { label?: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-2.5 py-1.5 text-xs text-muted-foreground sm:gap-2 sm:px-3 sm:py-2 sm:text-sm">
+    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/60 bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground sm:gap-2 sm:px-3 sm:py-2 sm:text-sm">
       <HelpCircle
         className="h-3.5 w-3.5 text-orange-500 sm:h-4 sm:w-4"
         aria-hidden
@@ -114,7 +115,7 @@ function InfoChip({
 }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-orange-300/50 hover:bg-muted/70 sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
+      className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-orange-300/50 hover:bg-muted/70 sm:gap-2 sm:px-3 sm:py-2 sm:text-sm"
       title={title}
     >
       <span className="text-orange-500">{icon}</span>
@@ -148,6 +149,7 @@ type CodesListProps = {
   copiedCodes: Set<string>;
   newCodes: Set<string>;
   onCodeCopied: (code: string) => void;
+  recentlyCopiedCode: string | null;
 };
 
 function CodesList({
@@ -155,6 +157,7 @@ function CodesList({
   copiedCodes,
   newCodes,
   onCodeCopied,
+  recentlyCopiedCode,
 }: CodesListProps) {
   if (codes.length === 0) {
     return (
@@ -165,7 +168,7 @@ function CodesList({
   }
 
   return (
-    <ul className="space-y-4 sm:space-y-6">
+    <ul className="space-y-3 sm:space-y-6">
       {codes.map((item) => {
         const archivedFormatted = formatDateOnly(item.archived);
         const archivedDisplay = archivedFormatted ?? "???";
@@ -212,6 +215,7 @@ function CodesList({
 
         const hasBeenCopied = copiedCodes.has(item.code);
         const isNewCode = newCodes.has(item.code);
+        const isRecentlyCopied = recentlyCopiedCode === item.code;
 
         return (
           <li key={item.code}>
@@ -222,36 +226,50 @@ function CodesList({
                   "border-border/40 bg-muted/70 opacity-70 hover:-translate-y-0 hover:border-border/40 hover:shadow-none"
               )}
             >
-              <CardHeader className="space-y-3 sm:space-y-4">
+              <CardHeader className="space-y-2 px-4 py-4 sm:space-y-4 sm:px-6 sm:py-6">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <span
-                    className={cn(
-                      "flex items-center gap-2 font-mono text-base font-semibold tracking-[0.18em] text-foreground sm:text-xl sm:tracking-[0.35em]",
-                      expired && "line-through decoration-2 decoration-red-400"
+                  <div className="flex min-w-0 items-center gap-1.5">
+                    <span
+                      className={cn(
+                        "rounded-lg px-2 py-1 font-mono text-sm font-semibold uppercase leading-tight tracking-[0.12em] text-foreground transition-all sm:px-0 sm:py-0 sm:text-xl sm:tracking-[0.28em]",
+                        expired && "line-through decoration-2 decoration-red-400",
+                        "data-[recent=true]:bg-emerald-500/10 data-[recent=true]:shadow-inner"
+                      )}
+                      data-recent={isRecentlyCopied}
+                    >
+                      <span className="block break-words [text-wrap:balance]">
+                        {item.code}
+                      </span>
+                    </span>
+                    {hasBeenCopied ? (
+                      <Check
+                        className="h-4 w-4 shrink-0 text-emerald-500 sm:h-5 sm:w-5"
+                        aria-hidden
+                      />
+                    ) : (
+                      <span className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" aria-hidden />
                     )}
-                  >
-                    {item.code}
-                  </span>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2">
                     {isNewCode ? (
                       <Badge
                         variant="accent"
-                        className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
+                        className="min-w-max gap-1 px-2 py-0.5 text-[10px] leading-tight normal-case sm:text-xs"
                       >
-                        NEU
+                        NEW
                       </Badge>
                     ) : null}
                     {expired ? (
                       <Badge
                         variant="subtle"
-                        className="gap-1 px-2 py-1 text-[11px] normal-case text-red-500 border-red-500/40 bg-red-500/10 sm:text-xs"
+                        className="min-w-max gap-1 px-2 py-0.5 text-[10px] leading-tight text-red-500 border-red-500/40 bg-red-500/10 sm:text-xs"
                       >
                         Abgelaufen
                       </Badge>
                     ) : (
                       <Badge
                         variant="success"
-                        className="gap-1 px-2 py-1 text-[11px] normal-case sm:text-xs"
+                        className="min-w-max gap-1 px-2 py-0.5 text-[10px] leading-tight normal-case sm:text-xs"
                       >
                         Verfügbar
                       </Badge>
@@ -284,7 +302,7 @@ function CodesList({
                   </Link>
                 ) : null}
               </CardHeader>
-              <CardContent className="flex flex-wrap gap-2 text-xs sm:gap-3 sm:text-sm">
+              <CardContent className="flex gap-1.5 overflow-x-auto px-4 pb-3 pt-1 text-[11px] sm:flex-wrap sm:gap-3 sm:px-6 sm:pb-6 sm:pt-2 sm:text-sm">
                 {reward}
                 {archivedChip}
                 {expiresChip}
@@ -301,6 +319,7 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
   const [activeFilter, setActiveFilter] = useState<CodeFilter>("all");
   const [copiedCodes, setCopiedCodes] = useState<Set<string>>(new Set());
   const [newCodes, setNewCodes] = useState<Set<string>>(new Set());
+  const [recentlyCopiedCode, setRecentlyCopiedCode] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -371,6 +390,8 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
   }, [codes]);
 
   const handleCodeCopied = useCallback((code: string) => {
+    setRecentlyCopiedCode(code);
+
     setCopiedCodes((prev) => {
       if (prev.has(code)) {
         return prev;
@@ -390,6 +411,20 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
     });
   }, []);
 
+  useEffect(() => {
+    if (!recentlyCopiedCode) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setRecentlyCopiedCode(null);
+    }, 1400);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [recentlyCopiedCode]);
+
   const filteredCodes = useMemo(() => {
     switch (activeFilter) {
       case "active":
@@ -402,7 +437,7 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
   }, [codes, activeFilter]);
 
   return (
-    <section className="space-y-5 sm:space-y-6">
+    <section className="space-y-4 sm:space-y-6">
       <div className="flex flex-wrap items-center gap-2 rounded-full border border-border/60 bg-muted/40 p-2">
         {FILTER_OPTIONS.map(({ id, label, icon: Icon }) => {
           const isActive = activeFilter === id;
@@ -429,6 +464,7 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
         copiedCodes={copiedCodes}
         newCodes={newCodes}
         onCodeCopied={handleCodeCopied}
+        recentlyCopiedCode={recentlyCopiedCode}
       />
     </section>
   );

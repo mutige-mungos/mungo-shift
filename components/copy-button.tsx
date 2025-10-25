@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Check, Copy as CopyIcon } from "iconoir-react";
+import { Copy as CopyIcon } from "iconoir-react";
 
 import { Button } from "@/components/ui/button";
 import { useCopyNotification } from "@/components/copy-notification-provider";
@@ -47,26 +47,24 @@ export function CopyButton({
     }
   }, [notifyCopy, onCopied, value]);
 
-  const showCopiedState = copied || hasCopied;
+  const hasCopiedBefore = hasCopied;
+  const isActive = copied;
 
   return (
     <Button
       type="button"
       onClick={handleCopy}
-      aria-label={showCopiedState ? "Code copied" : `Copy ${value}`}
-      variant={showCopiedState ? "secondary" : "outline"}
+      aria-label={hasCopiedBefore ? "Code bereits kopiert" : `Copy ${value}`}
+      variant="outline"
       size="icon"
-      className="rounded-full transition-colors hover:border-orange-400/60 hover:text-orange-500 data-[copied=true]:border-emerald-400/60 data-[copied=true]:text-emerald-500"
-      title={showCopiedState ? "Code kopiert" : "Code kopieren"}
-      data-copied={showCopiedState}
+      className="h-9 w-9 rounded-full border border-border/70 bg-background/80 text-muted-foreground transition-transform transition-colors hover:border-orange-400/60 hover:text-orange-500 sm:h-10 sm:w-10 data-[copied=true]:border-emerald-400/60 data-[copied=true]:text-emerald-500 data-[active=true]:scale-105"
+      title={hasCopiedBefore ? "Code kopiert" : "Code kopieren"}
+      data-copied={hasCopiedBefore}
+      data-active={isActive}
     >
-      {showCopiedState ? (
-        <Check className="h-4 w-4" aria-hidden />
-      ) : (
-        <CopyIcon className="h-4 w-4" aria-hidden />
-      )}
+      <CopyIcon className="h-4 w-4" aria-hidden />
       <span className="sr-only">
-        {showCopiedState ? "Code copied" : "Copy code"}
+        {hasCopiedBefore ? "Code copied" : "Copy code"}
       </span>
     </Button>
   );
