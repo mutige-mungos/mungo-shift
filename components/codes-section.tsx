@@ -232,7 +232,8 @@ function CodesList({
                     <span
                       className={cn(
                         "rounded-lg px-2 py-1 font-mono text-sm font-semibold uppercase leading-tight tracking-[0.12em] text-foreground transition-all sm:px-0 sm:py-0 sm:text-xl sm:tracking-[0.28em]",
-                        expired && "line-through decoration-2 decoration-red-400",
+                        expired &&
+                          "line-through decoration-2 decoration-red-400",
                         "data-[recent=true]:bg-emerald-500/10 data-[recent=true]:shadow-inner"
                       )}
                       data-recent={isRecentlyCopied}
@@ -247,7 +248,10 @@ function CodesList({
                         aria-hidden
                       />
                     ) : (
-                      <span className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" aria-hidden />
+                      <span
+                        className="h-4 w-4 shrink-0 sm:h-5 sm:w-5"
+                        aria-hidden
+                      />
                     )}
                   </div>
                   <div className="flex items-center gap-1 sm:gap-2">
@@ -256,7 +260,7 @@ function CodesList({
                         variant="accent"
                         className="min-w-max gap-1 px-2 py-0.5 text-[10px] leading-tight normal-case sm:text-xs"
                       >
-                        NEW
+                        NEU
                       </Badge>
                     ) : null}
                     {expired ? (
@@ -319,7 +323,9 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
   const [activeFilter, setActiveFilter] = useState<CodeFilter>("all");
   const [copiedCodes, setCopiedCodes] = useState<Set<string>>(new Set());
   const [newCodes, setNewCodes] = useState<Set<string>>(new Set());
-  const [recentlyCopiedCode, setRecentlyCopiedCode] = useState<string | null>(null);
+  const [recentlyCopiedCode, setRecentlyCopiedCode] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") {

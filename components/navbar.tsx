@@ -19,6 +19,10 @@ const toolsLinks = [
     href: "https://mapgenie.io/borderlands-4/maps/kairos",
   },
   {
+    label: "Black Market Location",
+    href: "https://www.blueberries.gg/borderlands/maurices-black-market/",
+  },
+  {
     label: "Skill Planner",
     href: "https://maxroll.gg/borderlands-4/planner",
   },
@@ -43,7 +47,7 @@ function NavLink({ href, isActive, children, className }: NavLinkProps) {
         "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-sm",
         "text-muted-foreground hover:text-foreground",
         isActive && "bg-orange-500/20 text-foreground",
-        className,
+        className
       )}
     >
       {children}
@@ -97,7 +101,10 @@ export function Navbar() {
             className="flex items-center gap-2 text-xs font-semibold text-foreground sm:text-sm"
             aria-label="SHiFT Codes home"
           >
-            <ShiftLogoIcon className="h-5 w-5 text-orange-500 sm:h-6 sm:w-6" aria-hidden />
+            <ShiftLogoIcon
+              className="h-5 w-5 text-orange-500 sm:h-6 sm:w-6"
+              aria-hidden
+            />
             <span className="text-sm font-semibold uppercase tracking-wide text-orange-500 sm:text-base">
               SHiFT
             </span>
