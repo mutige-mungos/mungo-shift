@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Copy as CopyIcon } from "iconoir-react";
 
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,22 @@ export function CopyButton({
   const [copied, setCopied] = useState(false);
   const [hasCopied, setHasCopied] = useState(initiallyCopied);
   const { notifyCopy } = useCopyNotification();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const audio = new Audio("/audio/copy.ogg");
+    audio.preload = "auto";
+    audioRef.current = audio;
+
+    return () => {
+      audioRef.current = null;
+      audio.pause();
+    };
+  }, []);
 
   useEffect(() => {
     setHasCopied(initiallyCopied);
@@ -41,6 +57,15 @@ export function CopyButton({
       setHasCopied(true);
       notifyCopy(`Code ${value} wurde kopiert`);
       onCopied?.(value);
+
+      if (audioRef.current) {
+        try {
+          audioRef.current.currentTime = 0;
+          void audioRef.current.play();
+        } catch (error) {
+          console.error("Failed to play copy sound", error);
+        }
+      }
     } catch (error) {
       console.error("Failed to copy code", error);
       setCopied(false);
