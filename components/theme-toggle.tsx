@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { HalfMoon, SunLight } from "iconoir-react";
 import { useTheme } from "next-themes";
 
@@ -9,9 +9,25 @@ import { cn } from "@/lib/utils";
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const audio = new Audio("/audio/switch.ogg");
+    audio.preload = "auto";
+    audioRef.current = audio;
+
+    return () => {
+      audio.pause();
+      audioRef.current = null;
+    };
   }, []);
 
   const currentTheme = useMemo(() => {
@@ -33,6 +49,19 @@ export function ThemeToggle({ className }: { className?: string }) {
   const isDark = currentTheme === "dark";
 
   const handleSelect = (mode: "light" | "dark") => {
+    if ((mode === "dark" && isDark) || (mode === "light" && !isDark)) {
+      return;
+    }
+
+    if (audioRef.current) {
+      try {
+        audioRef.current.currentTime = 0;
+        void audioRef.current.play();
+      } catch (error) {
+        console.error("Failed to play switch sound", error);
+      }
+    }
+
     setTheme(mode);
   };
 
