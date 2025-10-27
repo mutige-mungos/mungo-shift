@@ -385,6 +385,12 @@ export function CodesSection({ codes }: { codes: SanitizedCode[] }) {
     const nextNewCodes = new Set(unseenCodes);
     setNewCodes(nextNewCodes);
 
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("codes:new-count", { detail: nextNewCodes.size })
+      );
+    }
+
     if (unseenCodes.length > 0) {
       const updatedKnown = new Set(storedKnown);
       unseenCodes.forEach((code) => {

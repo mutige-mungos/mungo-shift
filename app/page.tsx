@@ -2,6 +2,7 @@ import { Barcode, Clock } from "iconoir-react";
 
 import { Footer } from "@/components/footer";
 import { CodesSection } from "@/components/codes-section";
+import { NewCodesBadge } from "@/components/new-codes-badge";
 import { loadActiveBl4Codes } from "@/lib/bl4";
 
 function formatUpdated(timestamp: string): string {
@@ -35,9 +36,15 @@ export default async function Home() {
             <span className="inline-flex items-center gap-2 whitespace-nowrap">
               <Barcode className="h-4 w-4 text-orange-500" aria-hidden />
               <span>
-                {data.count} aktive {data.count === 1 ? "Code" : "Codes"}
+                <span className="hidden sm:inline">
+                  {data.count} aktive {data.count === 1 ? "Code" : "Codes"}
+                </span>
+                <span className="sm:hidden">
+                  {data.count} aktiv
+                </span>
               </span>
             </span>
+            <NewCodesBadge codes={data.items} className="inline-flex items-center gap-2 whitespace-nowrap" />
           </div>
         </header>
         <CodesSection codes={data.items} />
