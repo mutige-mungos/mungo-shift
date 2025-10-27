@@ -23,9 +23,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Borderlands 4 SHiFT codes",
+  title: "Mutige Mungos SHiFT Codes",
   description:
-    "Live Borderlands 4 SHiFT codes with expiry tracking, exports, and notifications.",
+    "Heilige Claptrap-Schaltkreise! Die Mutigen Mungos haben das Chaos gezähmt – alle Borderlands SHiFT Codes auf einen Blick. Immer aktuell, sortiert und bereit für deinen nächsten Gold Key.",
   ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
   manifest: "/manifest.json",
   icons: {
@@ -33,6 +33,17 @@ export const metadata: Metadata = {
       { url: "/favicon.svg", type: "image/svg+xml" },
     ],
     shortcut: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
+  openGraph: {
+    title: "Mutige Mungos SHiFT Codes – Aktuelle Borderlands Gold Keys & Loot",
+    description:
+      "Heilige Claptrap-Schaltkreise! Die Mutigen Mungos haben das Chaos gezähmt – alle Borderlands SHiFT Codes auf einen Blick. Immer aktuell, sortiert und bereit für deinen nächsten Gold Key.",
+    type: "website",
+    images: [
+      {
+        url: "/og/cover.png",
+      },
+    ],
   },
 };
 
