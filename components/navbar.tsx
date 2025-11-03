@@ -19,6 +19,11 @@ const toolsLinks = [
     href: "https://mapgenie.io/borderlands-4/maps/kairos",
   },
   {
+    label: "Lootlemon Toolbox",
+    href: "https://www.lootlemon.com",
+  },
+
+  {
     label: "Black Market Location",
     href: "https://www.blueberries.gg/borderlands/maurices-black-market/",
   },
